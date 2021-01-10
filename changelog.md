@@ -6,3 +6,14 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 Initial Version after many years mouldering in an attic
 
+##[1.0.1] 2021-01-10
+
+Post release tidy
+
+### Changed
+
+Correct a couple of typos and links
+
+### Removed
+
+Removed resources and code related to Applet instantiation

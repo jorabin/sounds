@@ -36,7 +36,7 @@ Class [`org.linguafranca.sound.cadence.ToneScriptParser`](src/main/java/org/ling
 
 ### Make and Play a Raw Tone 
 
-See [`AudioEncodeTest.java`](./src/test/java/org/linguafranca/sound/audio/AudioEncoderTest.java)
+See [`AudioEncoderTest.java`](./src/test/java/org/linguafranca/sound/audio/AudioEncoderTest.java)
 
 ### Play a Tone
 
@@ -71,7 +71,7 @@ By the way, if you do have a SPA3102, and you'd like some introductory material 
 
 ## ToneScript
 
-I have [reformatted and tidied](./spec.md) the original Cisco documentation and wrote a BNF for Tonescript [see below](#tonescript). 
+I have [reformatted and tidied](./spec.md) the original Cisco documentation and wrote a BNF for Tonescript [see below](#tonescript-bnf). 
 
 The original documentation is [Small Business Systems Configuration Guide (pdf)](https://www.cisco.com/c/dam/en/us/td/docs/voice_ip_comm/csbpvga/ata/provisioning/guide/Provisioning.pdf) (under section "Data Types").
 
@@ -98,7 +98,7 @@ Which means:
     Segment 1: On=forever, with Frequencies 1 and 2
 
 
-### <a name="tonescript">ToneScript BNF</a>
+### <a name="tonescript-bnf">ToneScript BNF</a>
 I made a little [BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) for it, as follows:
 
 
@@ -150,6 +150,8 @@ I made a little [BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) fo
 ## Dependencies
 
 It's written for Java 1.8.
+
+Has a dependency on Google Guava.
 
 
 ## Change Log
