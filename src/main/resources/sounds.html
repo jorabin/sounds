@@ -1,0 +1,279 @@
+<!--
+  ~ Copyright (c) 2011 - 2021 Jo Rabin.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *     http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~
+  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+    <title>Sounds</title>
+    <script src="http://www.java.com/js/deployJava.js"></script><script type="text/javascript">
+
+        function progress(message){
+            statusArea.innerHTML = ' ' + message + '<br>' + statusArea.innerHTML;
+        }
+    </script><meta http-equiv="pragma" content="no-cache">
+    <style type="text/css">body {font-family:sans-serif; font-size:smaller; margin: 3em;}
+    #statusArea {
+        border: 1px solid black;
+        font-family: monospace;
+        min-height: 10em;
+        max-height: 10em;
+        overflow: scroll;
+    }
+    .syntax {font-weight: 900;}
+    .descriptor {text-align: center;}
+    .color1 {color: red;font-weight: normal;}
+    .color2 {color: blue;font-weight: normal;}
+    .color3 {color: green;font-weight: normal;}
+    table {border: 1px solid black;}
+    td {border: 1px solid black; padding: 0.5em;}
+    </style>
+    <script type="text/javascript">
+        var tones = {
+            "uk_dial": "350@-21,440@-19;10(*/0/1+2)",
+            "uk_ringback":"400@-20,450@-20;10(.4/.2/1+2,.4/2/1+2)",
+            "uk_busy":"400@-20;10(.375/.375/1)",
+            "uk_reorder":"400@-20;10(*/0/1)",
+            "uk_SIT":"950@-16,1400@-16,1800@-16;1(.33/0/1,.33/0/2,.33/0/3,0/1/0)",
+
+            "us_dial":"350@-13,440@-13;10(*/0/1+2)",
+            "us_ringback":"440@-19,480@-19;10(2/4/1+2)",
+            "us_busy":"480@-24,620@-24;10(.5/.5/1+2)",
+            "us_reorder":"480@-24,620@-24;10(.25/.25/1+2)",
+            "us_SIT":"985.2@-16,1370.6@-16,1776.7@-16;2(.380/0/1,.276/0/2,.380/0/3,0/1/0)"
+        };
+
+
+        function isEnterKey(event){
+            return ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13));
+        }
+
+        function playOnEnter(event) {
+            if (!event) var event = window.event;
+            if (isEnterKey(event)) playstring(this.value);
+        }
+        function dialOnEnter(event) {
+            if (!event) var event = window.event;
+            if (isEnterKey(event)) dialstring(this.value);
+        }
+        function getNoSpaceTextContent(elem){
+            if ('textContent' in elem) {
+                return elem.textContent.replace(/ /g,'');
+            }
+            return  elem.innerText.replace(/ /g,'');
+        }
+        function playselection(caller) {
+            document.sounds.stopSound();
+            soundPattern.value=tones[caller.value];
+            document.sounds.play(tones[caller.value]);
+        }
+
+        function playstring(string) {
+            document.sounds.stopSound();
+            soundPattern.value=string;
+            document.sounds.play(string);
+        }
+
+        function dialstring(string) {
+            document.sounds.stopSound();
+            dialPattern.value=string;
+            document.sounds.dial(string);
+        }
+
+        function doOnLoad() {
+            selectBox = document.getElementById("selectBox");
+            soundPattern = document.getElementById("soundPattern");
+            soundPattern.onkeypress=playOnEnter;
+            soundPattern.value = tones[selectBox.value];
+            dialPattern = document.getElementById("dialPattern");
+            dialPattern.onkeypress=dialOnEnter;
+            statusArea = document.getElementById("statusArea");
+        }
+    </script>
+</head>
+<body onload="doOnLoad();">
+<h1>Phone Sound Emulator</h1>
+
+<h2>Description</h2>
+
+<p>This emulator allows you to create the sounds that telephone networks make. It also allows you to emulate telephone ringer sounds (&quot;Ring ring, Neo&quot;) and to play DTMF - dial digits. Telephone networks generate distinctive tones for example to tell the caller that the dialled number is ringing, or is busy (engaged), or that the number is unobtainable.</p>
+
+<h2>Motivation</h2>
+
+<p>The motivation for writing this emulator was to simplify the configuration of a Cisco / Linksys / Sipura <a href="http://en.wikipedia.org/wiki/SPA3102">SPA3102</a> which is an <a href="http://en.wikipedia.org/wiki/Analog_telephone_adapter">Analog(ue) Telephone Adaptor</a> (ATA) - a device for connecting digital/Voice over IP (VoIP) telephony to the old fashioned telephone system. The Cisco SPA3102 (as well as other devices in the same family, afaik the SPA2102, SPA8000, SPA8800 and PAP2T) has very flexible configuration options, amongst which are that you can configure the call progress tones and the distinctive ring tones. But the syntax for specifying the tones (and cadences) is a bit (sic) opaque (see below) and it&#39;s it&#39;s quite hard to author tones - unless you can imagine them in your head, which I can&#39;t. So it seemed like it was worth writing an offline emulator to save the bother of loading the sounds into the SPA3102 and finding either that they are wrong or you don&#39;t like them.</p>
+
+<p>Configuring the SPA3102 is generally something that most people find quite hard, and this is only part of it, but that is another story that may be told some more fully other time. It&#39;s a story that has unfolded over quite a few years and taken &quot;more time than I&#39;d like&quot;. Consequently mucking around with the home VoIP network is relegated to an activity of very low priority. Christmas Holidays 2011 / New Year was the time that saw me doing this, which turned out to be a journey of exploration of the Java Sound system, MIDI and goodness knows what else.</p>
+
+<h2>Applet Permissions</h2>
+
+<p>The phone sound emulator is a Java applet which will hopefully, by now, have asked your permission to run. The software is &quot;signed&quot; by me - but I don&#39;t have a proper certificate and so your browser will tell you the applet is untrustworthy. If you have allowed it to run, then you should have heard three rising tones as it started up and you should see a message in a box below saying &quot;Sound System is Running&quot;. If you don&#39;t see that, or you don&#39;t want to give it permission, well, this is not going to work.</p>
+<script>
+    var attributes = {id:'sounds', code:'org.linguafranca.spa3102.PhoneSounds',  width:200, height:25, mayscript:true} ;
+    var parameters = {jnlp_href: 'sounds.jnlp', logger: 'progress'} ;
+    deployJava.runApplet(attributes, parameters, '1.6');
+</script>
+
+<h2>Emulation</h2>
+
+<h3>Tone and Ringer Cadence Emulation</h3>
+
+<p>Choose a predefined cadence descriptor or enter a descriptor (using the <a href="#sipuraNotation">Sipura notation</a> discussed below). You&#39;ll find an extensive list of tones from around the world at the (partly free) <a href="http://www.3amsystems.com/wireline/tone-search.htm">World PSTN Tone Database</a> from 3am Systems. Once you&#39;ve done a search for a tone in their database, they have a handy way of telling you what it is in Sipura notation.</p>
+
+<form action="javascript: void 0;" name="f1">
+    <p></p>
+    <select id="selectBox" onchange="playselection(this)"> <optgroup label="UK Tones"><option value="uk_dial">Dial Tone</option><option value="uk_ringback">Ringback Tone</option><option value="uk_busy">Busy Tone</option><option value="uk_reorder">Reorder Tone</option><option value="uk_SIT">Special Information Tone</option> </optgroup> <optgroup label="US Tones"><option value="us_dial">Dial Tone</option><option value="us_ringback">Ringback Tone</option><option value="us_busy">Busy Tone</option><option value="us_reorder">Reorder Tone</option><option value="us_SIT">Special Information Tone</option> </optgroup> </select><br />
+    <input id="soundPattern" name="soundPattern" placeholder="Enter a cadence script" size="100" type="text" /> <input onclick="playstring(soundPattern.value);" type="button" value="Play" /> <input onclick="document.sounds.stopSound();" type="button" value="Stop" />
+    <h3>Dial Digits Emulation</h3>
+
+    <p>Enter a sequence of digits to dial (valid &quot;digits&quot; are <a href="javascript: void 0;" onclick="dialstring(this.textContent.replace(/ /g,''));">123A456B789C*0#D</a>, spaces are ignored):</p>
+    <input id="dialPattern" name="dialPattern" onkeypress="if (isEnterKey()) document.sounds.dial(this.value);" placeholder="Enter a phone number" size="100" type="text" /> <input onclick="document.sounds.dial(dialPattern.value);" type="button" value="Dial" /> <input onclick="document.sounds.stopSound();" type="button" value="Stop" />
+    <h3>Log</h3>
+
+    <p id="statusArea">Status Area</p>
+
+    <p><input onclick="statusArea.innerHTML='Status Area'" type="button" value="Clear Log" /></p>
+</form>
+
+<h2 id="sipuraNotation">Tone and and Cadence Notation</h2>
+
+<p>In order to describe the sounds the SPA3102 (and therefore this emulator) should make, there&#39;s a notation (we call it Sipura notation elsewhere in this page) which is, as mentioned, a bit fiddly and for which no explanation is provided in the device <a href="http://www.cisco.com/en/US/docs/voice_ip_comm/csbpvga/ata/administration/guide/ATA_AG_v3_NC-WEB.pdf">Administration Guide</a>. It is, however, described in the <a href="http://www.cisco.com/en/US/docs/voice_ip_comm/csbpvga/ata/provisioning/guide/Cisco_Small_Business_IP_Telephony_Provisioning_Guide.pdf">Provisioning Manual</a> [See the section Data Types, Chapter 2, Page 57]. There&#39;s also a <a href="http://www.solidfluid.co.uk/sfsite.php/00000222">colour coded explanation of it</a> by Andy over at Solid Fluid Systems. I recommend you read that explanation. Not wholly incidentally, if you are on a journey to configure an SPA3102, you&#39;d do well to read Andy&#39;s entire set-up guide.</p>
+
+<p>For our purposes here&#39;s a very brief description. The string that describes the sound that you want to make is called a &quot;script&quot;. A script can be either a &quot;cadence script&quot; (which describes how to ring the bell of a phone) or a &quot;tone script&quot; (which describes the noise the network makes). The example scripts below are hyperlinks that make the relevant sound play (<a href="javascript: void 0;" onclick="document.sounds.stopSound()">Stop</a> will shut it up before it gets to the end if it&#39;s irritating). There is also a discussion of the <a href="#formalSyntax">formal syntax</a> (or what it might be) below.</p>
+
+<h3>Cadence Script</h3>
+
+<p>A cadence script may contain up to 6 sections and each section can contain up to 6 on/off duration specifications. The total length of the string can&#39;t exceed 127 characters. The durations are specified in seconds to a resolution of 1 millisecond (i.e. 0.001 is the smallest duration).</p>
+
+<p>[As things stand, when used for generating phone ringing sounds it sounds a bit like a British GPO Trim Phone from the 1970s and not much at all like a phone in The Matrix.]</p>
+
+<p>Example - Distinctive Ring (short, short, short, long): <a class="soundLink" href="javascript: void 0;" onclick="playstring(getNoSpaceTextContent(this));">60(0.2/0.2,0.2/0.2,0.2/0.2,1/4)</a> - for 60 seconds, repeat the pattern 200ms ring, 200ms silence (three times), then 1 second ring, 4 seconds silence.</p>
+
+<p>Example - UK Ring Ring Sound: <span class="descriptor"><a class="soundLink" href="javascript: void 0;" onclick="playstring(getNoSpaceTextContent(this));"><span class="syntax"> <span class="color1">10</span>(<span class="color2">0.4/0.2</span>,<span class="color3">0.4/2</span>)</span></a></span> - For <span class="color1">10</span> secs, ring for 0.4 secs then silent for 0.2 secs (<span class="color2">0.4/0.2</span>), ring again for 0.4 secs then silent for 2 secs (<span class="color3">0.4/2</span>).</p>
+
+<h3>Tone Script</h3>
+
+<p>A tone script contains at least one (and up to six) frequency scripts, which specify frequency (in integer Hz) and level (in up to 1 decimal place dBm), followed by a cadence script which in addition to specifying the on and off durations, also specify which frequencies are being turned on and off.</p>
+
+<p>Example - Dial Tone: <a class="soundLink" href="javascript: void 0;" onclick="playstring(getNoSpaceTextContent(this));">350@-19,440@-19;10(*/0/1+2)</a> - two frequency scripts, the first 350Hz at -19dBm, the second 440Hz at -19dBm; these two tones (1+2) are played for 10 secs, on all the time (*) off not at all (0).</p>
+
+<p>Example - UK Ringback Sound: <span class="descriptor"><a class="soundLink" href="javascript: void 0;" onclick="playstring(getNoSpaceTextContent(this));"> <span class="syntax"><span class="color2">400@-20</span>,<span class="color3">450@-20</span>; <span class="color1">10</span>(<span class="color2">0.4/0.2/1+2</span>,<span class="color3">0.4/2/1+2</span>)</span></a></span> - two frequency scripts, the first <span class="color2">400Hz at -20dBm</span>, the second <span class="color3">450Hz at -20dBm</span> Repeat for <span class="color1">10</span> secs, tones 1 and 2 for 0.4 secs then silent for 0.2 secs (<span class="color2">0.4/0.2/1+2</span>), tones 1 and 2 for 0.4 secs then silent for 2 secs (<span class="color3">0.4/2/1+2</span>).</p>
+
+<h2>Gory Details</h2>
+
+<h3 id="formalSyntax">The Sipura Syntax</h3>
+
+<p>Aside from the information in the <a href="http://www.cisco.com/en/US/docs/voice_ip_comm/csbpvga/ata/provisioning/guide/Cisco_Small_Business_IP_Telephony_Provisioning_Guide.pdf">Provisioning Manual</a> there doesn&#39;t seem to be a specification of the syntax - so my interpretation is fairly permissive and loose in ways that the SPA3102 may not be. For example, I allow white space between tokens, I don&#39;t know if this is actually permissible (other than in tone scripts, which the provisioning guide says is acceptable but not advised).</p>
+
+<p>FWIW the BNF that I worked to is roughly as follows (annotated with some implementation notes):</p>
+
+<pre>
+    // An optional list of toneScript (up to 6 in total), followed by a cadenceScript
+    // and possibly then more cadenceScript
+    &lt;script&gt;         ::= [&lt;toneScript&gt;&#39;;&#39;]&lt;cadenceScript&gt;{&#39;;&#39;&lt;cadenceScript&gt;}
+
+    // a comma separated list of tones  (up to 6)
+    &lt;toneScript&gt;     ::= &lt;tone&gt;[&#39;,&#39;&lt;toneScript&gt;]
+
+    // a tone is the combination of a frequency and a volume
+    &lt;tone&gt;           ::= &lt;frequency&gt;&#39;@&#39;&lt;dBm&gt;
+
+    // a frequency in Hertz  (must be an integer)
+    &lt;frequency&gt;      ::= &lt;integer&gt;
+
+    // a loudness value - see note below, -35 is very soft, -9 is the loudest distinguishable
+    // one decimal place is allowed
+    &lt;dBm&gt;            ::= &lt;float&gt;
+
+    // the sound pattern and duration
+    &lt;cadenceScript&gt;  ::= &lt;duration&gt;&lt;cadenceSection&gt;
+
+    // the duration to make the sound for - * means indefinite (implemented as 1,000 secs)
+    &lt;duration&gt;       ::= &lt;float&gt;|&#39;*&#39;
+
+    // a list of cadences in parentheses
+    &lt;cadenceSection&gt;    ::= &#39;(&#39;&lt;cadenceSegment&gt;&#39;)&#39;
+
+    // a comma separated list of &lt;cadenceSegment&gt;s
+    &lt;cadenceSegment&gt; ::= &lt;cadence&gt;[&#39;,&#39;&lt;cadenceSegment&gt;]
+
+    // if &lt;toneSpec&gt; is present - a &lt;toneCadence&gt; must be present.
+    // if &lt;toneSpec is not present then the third element of a &lt;toneCadence&gt; if present is ignored.
+    // not clear if it should be ignored or if that&#39;s an error
+    &lt;cadence&gt;        ::= &lt;toneCadence&gt; | &lt;nonToneCadence&gt;
+
+    // meaning sound-on/sound-off in secs (&#39;*&#39; for the on-value means for the &lt;duration&gt; of the cadence)
+    &lt;nonToneCadence&gt; ::= &lt;duration&gt; &#39;/&#39; &lt;float&gt;
+
+    // meaning sound-on/sound-off/tones-to-play
+    &lt;toneCadence&gt;    ::= &lt;nonToneCadence&gt;&#39;/&#39;&lt;toneList&gt;
+
+    // a plus separated list of indexes into the list of &lt;tones&gt;
+    // nothing is done about duplicates - not clear if that is an error
+    &lt;toneList&gt;       ::= &lt;toneIndex&gt;[&#39;+&#39;&lt;toneList&gt;]
+
+    // referencing the earlier &lt;tones&gt; 1 is the first
+    // a quirk of the implementation is that 0 and smaller indexes are interpreted as 1
+    // other than that an error is thrown if the index doesn&#39;t correspond to an element of the list
+    &lt;toneIndex&gt;      ::= &lt;integer&gt;
+
+</pre>
+
+<h3>dBm</h3>
+
+<p>The relative loudness of the sounds is specified in dBm. Translating these values into actual volumes seems a pretty arbitrary exercise. In this implementation any sound that is specified as being greater than about -9 dBm plays at &quot;maximum&quot; volume - i.e. sounds specified as being louder than that value (arithmetically greater) all play at the same volume.</p>
+
+<h3>Tone Generation</h3>
+
+<p>The tones are generated by producing a 44.1 kHz sampled sine wave at the relevant frequency for the duration specified in the &quot;on-time&quot; of the tone. If the &quot;duration&quot; of the list of cadences means that they are looped over then there is a click as the tone restarts out of phase (usually) with where it left off, plus with a small gap between the end of the previous wave form and the start of its continuation (sic). It doesn&#39;t seem worth fixing that, for now.</p>
+
+<h3 id="duration">Duration</h3>
+
+<p>The cadences are played in their entirety - so for example if the duration is 10 secs and the cadences take 3 secs to play, 4 loops will play totalling 12 secs.</p>
+
+<h3 id="bugs">Bugs</h3>
+
+<p>It would be quite surprising if there were not a few bugs.</p>
+
+<p>Aside from anything else cross-browser and version testing has been very limited.</p>
+
+<h2>Acknowledgements</h2>
+
+<p>I used <a href="http://www.jetbrains.com/idea/">JetBrains IntelliJ Idea</a> Community Edition to create this emulator.</p>
+
+<p><a href="http://shop.oreilly.com/product/9780596101992.do">JavaScript, The Definitive Guide</a> was, as usual, extremely useful.</p>
+
+<p>The <a href="http://docs.oracle.com/javase/tutorial/sound/index.html">Oracle Java sound tutorial</a> and their <a href="http://www.oracle.com/technetwork/java/index-139508.html">MIDI example</a> were useful in creating the initial MIDI based tone generator as well as for the sampled tone generator. The standard Java Midi synthesizer doesn&#39;t have a sine wave generator and doesn&#39;t allow precise specification of frequencies (you can play musical notes). So that could not be used and instead the tones are created using a software oscillator based on ideas from <a href="http://www.jsresources.org/examples/Oscillator.java.html">Oscillator.java</a> from Java Sound Resources and <a href="http://leware.net/temper/js/RouleJS.java">RouleJS.java</a> from Pierre Lewis at leware.net.</p>
+
+<p><a href="http://www.slf4j.org/">SLF4J</a> with <a href="http://logback.qos.ch/">LOGBack</a> provides the logging framework.</p>
+
+<p>Solid Fluid Systems provides a <a href="http://www.solidfluid.co.uk/sfsite.php/00000222">useful tutorial on the Sipura notation</a> - as well as a <a href="http://www.solidfluid.co.uk/sfsite.php/00000212">useful general guide to the SPA3102</a>.</p>
+
+<h2>References</h2>
+
+<ol>
+    <li><a href="http://www.cisco.com/en/US/docs/voice_ip_comm/csbpvga/ata/administration/guide/ATA_AG_v3_NC-WEB.pdf">Cisco Small Business SPA2102, SPA3102, SPA8000, SPA8800, PAP2T Analog Telehone Adapters Administration Guide</a></li>
+    <li><a href="http://www.cisco.com/en/US/docs/voice_ip_comm/csbpvga/ata/provisioning/guide/Cisco_Small_Business_IP_Telephony_Provisioning_Guide.pdf">Cisco Small Business Voice System, Voice Gateways and IP Telephones Provisioning Guide</a></li>
+    <li><a href="http://www.solidfluid.co.uk/sfsite.php/00000222">A discussion of the Sipura Syntax</a>, from Solid Fluid Systems</li>
+    <li><a href="http://forum.voxilla.com/voip-wiki/linksys-spa-regional-tab-settings-24364.html">A post on the Sipura Syntax</a>, by admin on Voxilla VoIP Forum</li>
+    <li><a href="http://www.3amsystems.com/wireline/tone-search.htm">The World Tone Database</a>, from 3am Systems</li>
+    <li><a href="http://nemesis.lonestar.org/reference/telecom/signaling/dtmf.html">Dual Tone Multi Frequency (DTMF) Reference</a>, by Frank Durada IV of lonestar.org</li>
+    <li><a href="http://docs.oracle.com/javase/tutorial/sound/index.html">The Java Sound Tutorial</a>, from Oracle</li>
+</ol>
+
+<hr />
+<p>By @jorabin, 3 Jan 2012, Version 1.0</p>
+</body>
+</html>
